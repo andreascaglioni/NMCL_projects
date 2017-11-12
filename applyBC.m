@@ -1,5 +1,3 @@
-% Function returns an extended vector, based on
-% the type of boundary condition requested
 function [hh, mh] = applyBC(Yh, bc)
     N = length(Yh)/2;
     hh = Yh(1:N,1); 
