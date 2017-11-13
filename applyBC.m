@@ -1,7 +1,4 @@
-function [hh, mh] = applyBC(Yh, bc)
-    N = length(Yh)/2;
-    hh = Yh(1:N,1); 
-    mh = Yh(N+1:N*2,1);
+function [hh, mh] = applyBC(hh, mh, bc)
     hh1 = hh(1);
     mh1 = mh(1);
     hhN = hh(end); 

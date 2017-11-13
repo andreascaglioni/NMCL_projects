@@ -1,10 +1,10 @@
 function [cc, hh, mh, uh, ERR]=ex_1_1(dx)
 %% choose
-BCNumber = 0;   % 0:periodic;   1:open
-ICNumber = 0;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
-SourceNumber = 0;  % 0: ex: 1.1;   1: no source
-ExaNumber = 0;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
-FluxNumber = 0; % 0:LF;     1:Roe
+BCNumber = 1;   % 0:periodic;   1:open
+ICNumber = 3;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
+SourceNumber = 1;  % 0: ex: 1.1;   1: no source
+ExaNumber = 1;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
+FluxNumber = 1; % 0:LF;     1:Roe
 %% BC string
 switch BCNumber
     case 0
@@ -27,10 +27,10 @@ switch ICNumber
         m0 = @(x) (0.*x);
     case 2
          h0 = @(x) (1-0.2*sin(2*pi*x));
-         m0 = @(x) (0*x);
+         m0 = @(x) (0*x+0.5);
     case 3
-        h0 = @(x) (1-0*x);
-        m0 = @(x) (-1.5*(x<1));
+        h0 = @(x) (1+0*x);
+        m0 = @(x) (-1.5*(x<=1));
 end
 %% source term
 switch SourceNumber 
@@ -56,7 +56,6 @@ switch ExaNumber
         mExa = @(x,t) 0*x+0*t;
 end
 %% domain and discretization
-%dx = 0.01;  
 xx = 0:dx:2;
 cc = dx/2:dx:2-dx/2;
 N = length(cc);
@@ -83,15 +82,13 @@ uh = mh0./hh0;
 %% solve
 k = CFL*dx/max(abs(uh)+(g*hh).^0.5);    %determine timestep
 time = 0.;
-figure;
-% F1Ext = zeros(N+1,1);
-% F2Ext = zeros(N+1,1);
+% figure;
 while time < T
     if(time+k>T)
         time = T-k;
     end
-    [hh, mh] = applyBC([hh;mh], bcType);     % enlarge the vectors by 2 each by applying BC
-    uh = mh./hh;    %also extend u
+    [hh, mh] = applyBC(hh, mh, bcType);     % enlarge the vectors by 2 each by applying BC
+    uh = mh./hh;                            %also extend u
     % numerical flux
     switch FluxNumber
         case 0
@@ -109,10 +106,10 @@ while time < T
     time = time+k;
     %compute new timestep
     k = CFL*dx/max(abs(uh)+(g*hh).^0.5);
-    %plot sl at every timestep
+    %plot sol at every timestep
 %     plotSOlFInalTIme(cc, hh, hExa, mh, mExa, uh, time);
-%     pause(0.001);
 %     press = waitforbuttonpress;
+%     pause(0.001);
 end
 %% plot final solution
 figure;
