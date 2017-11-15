@@ -30,7 +30,7 @@ switch ICNumber
          m0 = @(x) (0*x+0.5);
     case 3
         h0 = @(x) (1+0*x);
-        m0 = @(x) (-1.5*(x<=1));
+        m0 = @(x) (-1.5*(x<1));
 end
 %% source term
 switch SourceNumber 
@@ -67,7 +67,7 @@ switch BCNumber%depending on type of BC extend cc (used to evaluate integral of 
         ccExt = [cc1,cc,ccN];
 end
 CFL = 0.5;
-T = 2.;
+T = 0.5;%2.;
 %% discrete IC (integrated)
 hh0 = zeros(N, 1);      %stores discrete solution in a 1 dim vector (for every t)
 mh0 = zeros(N, 1);
@@ -107,8 +107,8 @@ while time < T
     %compute new timestep
     k = CFL*dx/max(abs(uh)+(g*hh).^0.5);
     %plot sol at every timestep
-%     plotSOlFInalTIme(cc, hh, hExa, mh, mExa, uh, time);
-%     press = waitforbuttonpress;
+    plotSOlFInalTIme(cc, hh, hExa, mh, mExa, uh, time);
+    press = waitforbuttonpress;
 %     pause(0.001);
 end
 %% plot final solution
