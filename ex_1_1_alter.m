@@ -1,4 +1,20 @@
 function [cc, hh, mh, uh, ERR]=ex_1_1(dx)
+% the "main" function fo the assignment which executes the task and calls
+% the other functions. The only data is the meshs pacing, howoever all
+% other parametnes can be chose in the section "choose" (boundary 
+% conditions, initial conditions, source term, exact solution, numerical 
+% flux) (see comments) and " domain and discretization" (CFL number, final
+% time).
+% data:
+%     dx      spacing for space discretization
+% returns:    
+%     cc      vector containig interface points of cells
+%     hh      numerical solution for height at final time
+%     mh      numerical solution for discharge at final time
+%     uh      numerical solution for speed (ratio discharge/height) at 
+%             final time
+%     ERR     L1 error of the numerical solution wrt the analytical 
+%             solution (n.b. relevant only if the analytical solution is available
 %% choose
 BCNumber = 1;   % 0:periodic;   1:open
 ICNumber = 3;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
@@ -20,17 +36,17 @@ f2 = @(h,m) (m.^2./h + 0.5*g*h.^2);
 switch ICNumber
     case 0
         u = 0.25;   %INITIAL velocity
-        h0 = @(x) (1+0.5*sin(pi*x));
+        h0 = @(x) (1.+0.5*sin(pi*x));
         m0 = @(x) (u*h0(x));
     case 1
-         h0 = @(x) (1-0.1*sin(pi*x));
+         h0 = @(x) (1.-0.1*sin(pi*x));
         m0 = @(x) (0.*x);
     case 2
-         h0 = @(x) (1-0.2*sin(2*pi*x));
+         h0 = @(x) (1.-0.2*sin(2*pi*x));
          m0 = @(x) (0*x+0.5);
     case 3
-        h0 = @(x) (1+0*x);
-        m0 = @(x) (-1.5*(x<=1));
+        h0 = @(x) (1.+0*x);
+        m0 = @(x) (-1.5*(x<1));
 end
 %% source term
 switch SourceNumber 
@@ -59,15 +75,8 @@ end
 cc = 0:dx:2;    %cells boundaries
 xx = dx/2:dx:2-dx/2;    %cells' centerpoints
 N = length(xx); % number of cells
-% cc1=cc(1); ccN = cc(end);
-% switch BCNumber%depending on type of BC extend cc (used to evaluate integral of S later)
-%     case 0
-%          ccExt = [ccN,cc,cc1];
-%     case 1
-%         ccExt = [cc1,cc,ccN];
-% end
 CFL = 0.5;
-T = 2.;
+T = 0.5;
 %% discrete IC (integrated)
 hh0 = zeros(N, 1);      %stores discrete solution in a 1 dim vector (for every t)
 mh0 = zeros(N, 1);
@@ -79,6 +88,8 @@ end
 hh = hh0;  %initialize solution to IC
 mh = mh0;
 uh = mh0./hh0;
+% plotSOlAtTIme(xx, hh, @(x)hExa(x,0.), mh, @(x)mExa(x,0.));
+% press  = waitforbuttonpress;
 %% solve
 k = CFL*dx/max(abs(uh)+(g*hh).^0.5);    %determine timestep
 time = 0.;
@@ -107,13 +118,13 @@ while time < T
     %compute new timestep
     k = CFL*dx/max(abs(uh)+(g*hh).^0.5);
     %plot sol at every timestep
-    plotSOlFInalTIme(xx, hh, hExa, mh, mExa, uh, time);
-    press = waitforbuttonpress;
+%     plotSOlAtTIme(xx, hh, @(x)hExa(x,time), mh, @(x)mExa(x,time));
+%     press = waitforbuttonpress;
 %     pause(0.001);
 end
 %% plot final solution
-figure;
-plotSOlFInalTIme(xx, hh, hExa, mh, mExa, uh, T);
+figure
+plotSOlAtTIme(xx, hh, @(x)hExa(x,T), mh, @(x)mExa(x,T));
 %% compute error at final time (in L^1)
 ERR = computeL1Error(hExa, mExa, hh, mh, cc, T);
 end
