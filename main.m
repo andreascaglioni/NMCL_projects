@@ -1,4 +1,4 @@
-function [cc, hh, mh, uh, ERR]=ex_1_1(dx)
+function [cc, hh, mh, uh, ERR]=main(dx)
 % the "main" function fo the assignment which executes the task and calls
 % the other functions. The only data is the meshs pacing, howoever all
 % other parametnes can be chose in the section "choose" (boundary 
@@ -14,12 +14,12 @@ function [cc, hh, mh, uh, ERR]=ex_1_1(dx)
 %     uh      numerical solution for speed (ratio discharge/height) at 
 %             final time
 %     ERR     L1 error of the numerical solution wrt the analytical 
-%             solution (n.b. relevant only if the analytical solution is available
+%        solution (n.b. relevant only if the analytical solution is available
 %% choose
-BCNumber = 1;   % 0:periodic;   1:open
-ICNumber = 3;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
-SourceNumber = 1;  % 0: ex: 1.1;   1: no source
-ExaNumber = 1;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
+BCNumber = 0;   % 0:periodic;   1:open
+ICNumber = 0;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
+SourceNumber = 0;  % 0: ex: 1.1;   1: no source
+ExaNumber = 0;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
 FluxNumber = 1; % 0:LF;     1:Roe
 %% BC string
 switch BCNumber
@@ -76,7 +76,7 @@ cc = 0:dx:2;    %cells boundaries
 xx = dx/2:dx:2-dx/2;    %cells' centerpoints
 N = length(xx); % number of cells
 CFL = 0.5;
-T = 0.5;
+T = 2.;
 %% discrete IC (integrated)
 hh0 = zeros(N, 1);      %stores discrete solution in a 1 dim vector (for every t)
 mh0 = zeros(N, 1);
