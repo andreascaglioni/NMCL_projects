@@ -1,4 +1,4 @@
-function [cc, hh, mh, uh, ERR]=main(dx)
+    function [cc, hh, mh, uh, ERR]=main(dx)
 % the "main" function fo the assignment which executes the task and calls
 % the other functions. The only data is the meshs pacing, howoever all
 % other parametnes can be chose in the section "choose" (boundary 
@@ -16,10 +16,10 @@ function [cc, hh, mh, uh, ERR]=main(dx)
 %     ERR     L1 error of the numerical solution wrt the analytical 
 %        solution (n.b. relevant only if the analytical solution is available
 %% choose
-BCNumber = 0;   % 0:periodic;   1:open
-ICNumber = 0;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
-SourceNumber = 0;  % 0: ex: 1.1;   1: no source
-ExaNumber = 0;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
+BCNumber = 1;   % 0:periodic;   1:open
+ICNumber = 3;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
+SourceNumber = 1;  % 0: ex: 1.1;   1: no source
+ExaNumber = 1;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
 FluxNumber = 1; % 0:LF;     1:Roe
 %% BC string
 switch BCNumber
@@ -46,7 +46,7 @@ switch ICNumber
          m0 = @(x) (0*x+0.5);
     case 3
         h0 = @(x) (1.+0*x);
-        m0 = @(x) (-1.5*(x<1));
+        m0 = @(x) (-1.5*(x<1.) -0.75*(x==1.));
 end
 %% source term
 switch SourceNumber 
@@ -76,7 +76,7 @@ cc = 0:dx:2;    %cells boundaries
 xx = dx/2:dx:2-dx/2;    %cells' centerpoints
 N = length(xx); % number of cells
 CFL = 0.5;
-T = 2.;
+T = 0.5;
 %% discrete IC (integrated)
 hh0 = zeros(N, 1);      %stores discrete solution in a 1 dim vector (for every t)
 mh0 = zeros(N, 1);
@@ -108,8 +108,8 @@ while time < T
             [F1Ext, F2Ext] = RoeNumericalFlux(hh, mh, f1, f2, g);
     end
     % local average of the RHS
-    S1Int = (S1Prim(uh(2:end-1), cc(2:end)', time) - S1Prim(uh(2:end-1), cc(1:end-1)', time))/dx;
-    S2Int = (S2Prim(uh(2:end-1), cc(2:end)', time) - S2Prim(uh(2:end-1), cc(1:end-1)', time))/dx;
+    S1Int = (S1Prim(uh(2:end-1),cc(2:end)',time)-S1Prim(uh(2:end-1),cc(1:end-1)',time))/dx;
+    S2Int = (S2Prim(uh(2:end-1),cc(2:end)',time)-S2Prim(uh(2:end-1),cc(1:end-1)',time))/dx;
     % time advancement
     hh = hh(2:end-1) - k/dx*(F1Ext(2:end) - F1Ext(1:end-1)) + k*S1Int;
     mh = mh(2:end-1) - k/dx*(F2Ext(2:end) - F2Ext(1:end-1)) + k*S2Int;
@@ -118,9 +118,9 @@ while time < T
     %compute new timestep
     k = CFL*dx/max(abs(uh)+(g*hh).^0.5);
     %plot sol at every timestep
-%     plotSOlAtTIme(xx, hh, @(x)hExa(x,time), mh, @(x)mExa(x,time));
-%     press = waitforbuttonpress;
-%     pause(0.001);
+    plotSOlAtTIme(xx, hh, @(x)hExa(x,time), mh, @(x)mExa(x,time));
+    press = waitforbuttonpress;
+%   pause(0.001);
 end
 %% plot final solution
 figure

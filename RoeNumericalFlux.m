@@ -18,7 +18,7 @@ function [F1Ext, F2Ext] = RoeNumericalFlux(hh, mh, f1, f2, g)
     %% Roe matrices
     ARoe = zeros(N+1,2,2); 
     for i = 1:N+1 
-        A = [0, 1; g*z1s(i)-w(i).^2, 2*w(i)];
+        A = [0., 1.; g*z1s(i)-w(i).^2., 2.*w(i)];
         [S,L] = eig(A);
         LRoe = abs(L);
         ARoe(i,:,:) = S*LRoe/S;

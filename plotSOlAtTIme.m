@@ -9,13 +9,29 @@ function [] = plotSOlAtTIme(cc, hh, hExa, mh, mExa)
 %     mExa  function handle mExa(x,t) depending on space and time for exact
 %           values of mh (at given time)
     uh = mh./hh;
-    subplot(3,1,1)
+    
+    x0=10;
+    y0=10;
+    width=550;
+    height=700;
+    
+    subplot(2,1,1)
     plot(cc, hh, cc ,hExa(cc));
-    grid on; title 'height';
-    subplot(3,1,2)
+    set(gcf,'units','points','position',[x0,y0,width,height]);
+    grid on;
+    title 'Height';
+    set(gca,'FontSize',16);
+    subplot(2,1,2)
     plot(cc, mh, cc ,mExa(cc));
-    grid on; title 'discharge';
-    subplot(3,1,3)
-    plot(cc, uh); grid on; title 'speed';
+    set(gcf,'units','points','position',[x0,y0,width,height]);
+    grid on;
+    title 'Discharge';
+    set(gca,'FontSize',16);
+%     subplot(3,1,3)
+%     plot(cc, uh);
+%     set(gcf,'units','points','position',[x0,y0,width,height]);
+%     grid on;
+%     title 'Speed';
+%     set(gca,'FontSize',16);
 end
 
