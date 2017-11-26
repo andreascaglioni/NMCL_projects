@@ -16,18 +16,11 @@
 %     ERR     L1 error of the numerical solution wrt the analytical 
 %        solution (n.b. relevant only if the analytical solution is available
 %% choose
-BCNumber = 1;   % 0:periodic;   1:open
-ICNumber = 3;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
-SourceNumber = 1;  % 0: ex: 1.1;   1: no source
-ExaNumber = 1;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
-FluxNumber = 1; % 0:LF;     1:Roe
-%% BC string
-switch BCNumber
-    case 0
-        bcType = 'Periodic';
-    case 1
-        bcType = 'Open';
-end
+BCNumber = 0;   % 0:periodic;   1:open
+ICNumber = 0;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
+SourceNumber = 0;  % 0: ex: 1.1;   1: no source
+ExaNumber = 0;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
+FluxNumber = 0; % 0:LF;     1:Roe
 %% physical parameters
 g = 1;
 f1 = @(h,m) (m);
@@ -76,7 +69,7 @@ cc = 0:dx:2;    %cells boundaries
 xx = dx/2:dx:2-dx/2;    %cells' centerpoints
 N = length(xx); % number of cells
 CFL = 0.5;
-T = 0.5;
+T = 2.;
 %% discrete IC (integrated)
 hh0 = zeros(N, 1);      %stores discrete solution in a 1 dim vector (for every t)
 mh0 = zeros(N, 1);
@@ -98,7 +91,7 @@ while time < T
     if(time+k>T)
         time = T-k;
     end
-    [hh, mh] = applyBC(hh, mh, bcType);     % enlarge the vectors by 2 each by applying BC
+    [hh, mh] = applyBC(hh, mh, BCNumber);     % enlarge the vectors by 2 each by applying BC
     uh = mh./hh;                            %also extend u
     % numerical flux
     switch FluxNumber
@@ -118,8 +111,8 @@ while time < T
     %compute new timestep
     k = CFL*dx/max(abs(uh)+(g*hh).^0.5);
     %plot sol at every timestep
-    plotSOlAtTIme(xx, hh, @(x)hExa(x,time), mh, @(x)mExa(x,time));
-    press = waitforbuttonpress;
+%     plotSOlAtTIme(xx, hh, @(x)hExa(x,time), mh, @(x)mExa(x,time));
+%     press = waitforbuttonpress;
 %   pause(0.001);
 end
 %% plot final solution
