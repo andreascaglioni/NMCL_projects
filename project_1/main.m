@@ -17,9 +17,9 @@
 %        solution (n.b. relevant only if the analytical solution is available
 %% choose
 BCNumber = 0;   % 0:periodic;   1:open
-ICNumber = 0;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
-SourceNumber = 0;  % 0: ex: 1.1;   1: no source
-ExaNumber = 0;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
+ICNumber = 2;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
+SourceNumber = 1;  % 0: ex: 1.1;   1: no source
+ExaNumber = 1;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
 FluxNumber = 0; % 0:LF;     1:Roe
 %% physical parameters
 g = 1;
@@ -84,10 +84,11 @@ uh = mh0./hh0;
 % plotSOlAtTIme(xx, hh, @(x)hExa(x,0.), mh, @(x)mExa(x,0.));
 % press  = waitforbuttonpress;
 %% solve
-k = CFL*dx/max(abs(uh)+(g*hh).^0.5);    %determine timestep
 time = 0.;
 % figure;
 while time < T
+    %compute new timestep
+    k = CFL*dx/max(abs(uh)+(g*hh).^0.5);
     if(time+k>T)
         time = T-k;
     end
@@ -108,8 +109,7 @@ while time < T
     mh = mh(2:end-1) - k/dx*(F2Ext(2:end) - F2Ext(1:end-1)) + k*S2Int;
     uh = mh./hh;
     time = time+k;
-    %compute new timestep
-    k = CFL*dx/max(abs(uh)+(g*hh).^0.5);
+
     %plot sol at every timestep
 %     plotSOlAtTIme(xx, hh, @(x)hExa(x,time), mh, @(x)mExa(x,time));
 %     press = waitforbuttonpress;
