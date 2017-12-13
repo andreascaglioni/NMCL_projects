@@ -1,4 +1,4 @@
-function [] = plotSOlAtTIme(cc, hh, hExa, mh, mExa)
+function [] = plotSolAtTIme(cc, Uh, hExa, mExa)
 % plots given functions of 1 varaible that take values in R
 % data: 
 %     cc    points for x component of plot
@@ -8,7 +8,7 @@ function [] = plotSOlAtTIme(cc, hh, hExa, mh, mExa)
 %     mh    vector of values of a function (discharge) to plot
 %     mExa  function handle mExa(x,t) depending on space and time for exact
 %           values of mh (at given time)
-    uh = mh./hh;
+    uh = Uh(:,2)./Uh(:,1);
     
     x0=10;
     y0=10;
@@ -16,13 +16,13 @@ function [] = plotSOlAtTIme(cc, hh, hExa, mh, mExa)
     height=700;
     
     subplot(2,1,1)
-    plot(cc, hh, cc ,hExa(cc));
+    plot(cc, Uh(:,1), cc ,hExa(cc));
     set(gcf,'units','points','position',[x0,y0,width,height]);
     grid on;
     title 'Height';
     set(gca,'FontSize',16);
     subplot(2,1,2)
-    plot(cc, mh, cc ,mExa(cc));
+    plot(cc, Uh(:,2), cc ,mExa(cc));
     set(gcf,'units','points','position',[x0,y0,width,height]);
     grid on;
     title 'Discharge';
