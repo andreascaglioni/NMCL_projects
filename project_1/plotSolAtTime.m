@@ -1,4 +1,4 @@
-function [] = plotSOlAtTIme(cc, hh, hExa, mh, mExa)
+function [] = plotSolAtTime(cc, hh, hExa, mh, mExa)
 % plots given functions of 1 varaible that take values in R
 % data: 
 %     cc    points for x component of plot
