@@ -16,8 +16,8 @@
 %     ERR     L1 error of the numerical solution wrt the analytical 
 %        solution (n.b. relevant only if the analytical solution is available
 %% choose
-BCNumber = 0;   % 0:periodic;   1:open
-ICNumber = 2;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
+BCNumber = 1;   % 0:periodic;   1:open
+ICNumber = 3;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
 SourceNumber = 1;  % 0: ex: 1.1;   1: no source
 ExaNumber = 1;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
 FluxNumber = 0; % 0:LF;     1:Roe
@@ -69,7 +69,7 @@ cc = 0:dx:2;    %cells boundaries
 xx = dx/2:dx:2-dx/2;    %cells' centerpoints
 N = length(xx); % number of cells
 CFL = 0.5;
-T = 2.;
+T = 0.5;
 %% discrete IC (integrated)
 hh0 = zeros(N, 1);      %stores discrete solution in a 1 dim vector (for every t)
 mh0 = zeros(N, 1);
@@ -81,7 +81,7 @@ end
 hh = hh0;  %initialize solution to IC
 mh = mh0;
 uh = mh0./hh0;
-% plotSOlAtTIme(xx, hh, @(x)hExa(x,0.), mh, @(x)mExa(x,0.));
+% plotSolAtTime(xx, hh, @(x)hExa(x,0.), mh, @(x)mExa(x,0.));
 % press  = waitforbuttonpress;
 %% solve
 time = 0.;
@@ -111,13 +111,13 @@ while time < T
     time = time+k;
 
     %plot sol at every timestep
-%     plotSOlAtTIme(xx, hh, @(x)hExa(x,time), mh, @(x)mExa(x,time));
+%     plotSolAtTime(xx, hh, @(x)hExa(x,time), mh, @(x)mExa(x,time));
 %     press = waitforbuttonpress;
 %   pause(0.001);
 end
 %% plot final solution
 figure
-plotSOlAtTIme(xx, hh, @(x)hExa(x,T), mh, @(x)mExa(x,T));
+plotSolAtTime(xx, hh, @(x)hExa(x,T), mh, @(x)mExa(x,T));
 %% compute error at final time (in L^1)
 ERR = computeL1Error(hExa, mExa, hh, mh, cc, T);
 end
