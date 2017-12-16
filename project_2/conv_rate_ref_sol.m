@@ -34,6 +34,6 @@ ylabel 'Error';
 legend('Error w.r.t. reference solution', 'f(dx)=dx');
 set(gcf,'units','points','position',[x0,y0,width,height]);
 set(gca,'FontSize',16);
-xlim([1.e-3 5.e-2]);
-ylim([1.e-2 3.e-1]);
+% xlim([1.e-3 5.e-2]);
+% ylim([1.e-2 3.e-1]);
     

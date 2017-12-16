@@ -8,7 +8,7 @@ function [ slope ] = eval_slope( ul, ur, SlopeNumber)
         case 1
             slope = minmod([ul,ur]);
         case 2
-            slope = minmod([(ul+ur)/2 2*ul 2*ur]);
+            slope = minmod([(ul+ur)/2., 2.*ul, 2.*ur]);
     end
 
 end

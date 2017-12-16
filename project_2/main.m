@@ -21,7 +21,7 @@ ICNumber = 0;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
 SourceNumber = 0;  % 0: ex: 1.1;   1: no source
 ExaNumber = 0;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
 FluxNumber = 0; % 0:LF;     1:Roe
-SlopeNumber = 0;    %0: zero;   1: MinMod;  2:MUSCL
+SlopeNumber = 2;    %0: zero;   1: MinMod;  2:MUSCL
 %% physical parameters
 g = 1;
 f1 = @(h,m) (m);
@@ -40,7 +40,7 @@ switch ICNumber
          m0 = @(x) (0*x+0.5);
     case 3
         h0 = @(x) (1.+0*x);
-        m0 = @(x) (-1.5*(x<1.) -0.75*(x==1.));
+        m0 = @(x) (-1.5*(x<1.));
 end
 %% source term
 switch SourceNumber 
@@ -95,23 +95,19 @@ while time < T
     if(time+k>T)
         time = T-k;
     end
-    
     % Update solution
-    rhs  = eval_rhs(Xh, BCNumber, FluxNumber, SlopeNumber, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel); 
+    rhs = eval_rhs(Xh, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel, BCNumber, FluxNumber, SlopeNumber); 
     X1 = Xh + k*rhs;
-    rhs  = eval_rhs(X1, BCNumber, FluxNumber, SlopeNumber, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel); 
+    rhs = eval_rhs(X1, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel, BCNumber, FluxNumber, SlopeNumber); 
     X2 = (3*Xh + X1 + k*rhs)/4;
-	rhs  = eval_rhs(X2, BCNumber, FluxNumber, SlopeNumber, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel); 
-    Xh  = (Xh + 2*X2 + 2*k*rhs)/3;
-
+	rhs = eval_rhs(X2, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel, BCNumber, FluxNumber, SlopeNumber); 
+    Xh = (Xh + 2*X2 + 2*k*rhs)/3;
     uh = Xh(:,2)./Xh(:,1);
-    
     time = time+k;
-
     %plot sol at every timestep
-%    plotSolAtTime(xx, hh, @(x)hExa(x,time), mh, @(x)mExa(x,time));
+%    plotSolAtTime(cc, Xh, @(x)hExa(x,time), @(x)mExa(x,time));
 %    press = waitforbuttonpress;
-%   pause(0.001);
+%    pause(0.001);
 end
 %% plot final solution
 figure

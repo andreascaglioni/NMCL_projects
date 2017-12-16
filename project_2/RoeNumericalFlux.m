@@ -35,7 +35,9 @@ function [FExt] = RoeNumericalFlux(u, v, f1, f2, g, maxVel)
         ARoe(i,:,:) = S*LRoe/S;
     end
     %% return the numerical flux
-    FExt = 0.5*(Fu+Fv) - 0.5*([ARoe(:,1,1).*(hv-hu) + ARoe(:,1,2).*(mv-mu), ARoe(:,2,1).*(hv-hu) + ARoe(:,2,2).*(mv-mu)]);
+    FExt = 0.5*(Fu+Fv) ...
+         - 0.5*([ARoe(:,1,1).*(hv-hu) + ARoe(:,1,2).*(mv-mu), ...
+                 ARoe(:,2,1).*(hv-hu) + ARoe(:,2,2).*(mv-mu)]);
     
 end
 
