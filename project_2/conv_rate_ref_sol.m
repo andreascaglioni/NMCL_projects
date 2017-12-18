@@ -27,7 +27,7 @@ width=500;
 height=500;
 close all;
 figure;
-loglog(dx, err, '.',dx,6*dx.^1, 'k-', 'markersize', 15);
+loglog(dx, err, '.',dx,6*dx.^2, 'k-', 'markersize', 15);
 grid on;
 xlabel 'dx';
 ylabel 'Error';

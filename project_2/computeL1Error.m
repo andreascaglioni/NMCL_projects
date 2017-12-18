@@ -1,4 +1,4 @@
-function [ERR] = computeL1Error(hExa, mExa, Xh, xx, T)
+function [ERR] = computeL1Error(hExa, mExa, Xh, xx, dx)
 % computes L1 norm of the difference of numerical solution and given exact solution
 % data:
 %      hExa  function handle hExa(x) depending on space for exact
@@ -15,10 +15,16 @@ function [ERR] = computeL1Error(hExa, mExa, Xh, xx, T)
     mh = Xh(:,2);
     err = zeros(1,N);
     for j=1:N
-        hExaFinal =@(x) abs(hExa(x,T)-hh(j));
-        mExaFinal =@(x) abs(mExa(x,T)-mh(j));
+        % error using exact solution integrated with high-order scheme
+        hExaFinal =@(x) abs(hExa(x)-hh(j));
+        mExaFinal =@(x) abs(mExa(x)-mh(j));
         err(j) = (integral(hExaFinal,xx(j),xx(j+1),'absTol', 1e-14)+...
                   integral(mExaFinal,xx(j),xx(j+1),'absTol', 1e-14));
+        
+        % using cell averages of exact solution
+%         hExaAver = integral(hExa,xx(j),xx(j+1),'absTol', 1e-14)/dx;
+%         mExaAver = integral(mExa,xx(j),xx(j+1),'absTol', 1e-14)/dx;
+%         err(j) = dx*(abs(hExaAver - hh(j)) + abs(mExaAver - mh(j)));
     end
     ERR = sum(err);
 end

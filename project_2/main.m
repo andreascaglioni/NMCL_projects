@@ -21,7 +21,7 @@ ICNumber = 0;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
 SourceNumber = 0;  % 0: ex: 1.1;   1: no source
 ExaNumber = 0;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
 FluxNumber = 0; % 0:LF;     1:Roe
-SlopeNumber = 2;    %0: zero;   1: MinMod;  2:MUSCL
+SlopeNumber = 0;    %0: zero;   1: MinMod;  2:MUSCL
 %% physical parameters
 g = 1;
 f1 = @(h,m) (m);
@@ -98,9 +98,9 @@ while time < T
     % Update solution
     rhs = eval_rhs(Xh, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel, BCNumber, FluxNumber, SlopeNumber); 
     X1 = Xh + k*rhs;
-    rhs = eval_rhs(X1, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel, BCNumber, FluxNumber, SlopeNumber); 
+    rhs = eval_rhs(X1, f1, f2, g, S1Prim, S2Prim, xx, dx, time+k, maxVel, BCNumber, FluxNumber, SlopeNumber); 
     X2 = (3*Xh + X1 + k*rhs)/4;
-	rhs = eval_rhs(X2, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel, BCNumber, FluxNumber, SlopeNumber); 
+	rhs = eval_rhs(X2, f1, f2, g, S1Prim, S2Prim, xx, dx, time+0.5*k, maxVel, BCNumber, FluxNumber, SlopeNumber); 
     Xh = (Xh + 2*X2 + 2*k*rhs)/3;
     uh = Xh(:,2)./Xh(:,1);
     time = time+k;
@@ -113,5 +113,5 @@ end
 figure
 plotSolAtTime(cc, Xh,  @(x)hExa(x,T), @(x)mExa(x,T));
 %% compute error at final time (in L^1)
-ERR = computeL1Error(hExa, mExa, Xh, cc, T);
+ERR = computeL1Error(@(x)hExa(x,T), @(x)mExa(x,T), Xh, cc, dx);
 end
