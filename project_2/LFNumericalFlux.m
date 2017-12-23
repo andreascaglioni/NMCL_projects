@@ -1,15 +1,16 @@
-function [FExt] = LFNumericalFlux(u, v, f1, f2, g, maxVel)
+function [FExt] = LFNumericalFlux(u, v, maxVel)
 % Computes Lax-Friedrichs numerical flux of finite volumes method applied to shallow water (1d). 
 % data: 
-%     hh    vecor of first unknown (height)
-%     mh    vecor of second unknown (discharge)
-%     f1    function handle of first component of the problem's flux
-%     f2    function handle of secondcomponent of the problem's flux
-%     g     real number (gravity acceleration)
+%     u,v       vectors argument of the flux
+%     maxVel    maximum speed of the system
 % returns:
-%   F1Ext   numerical flux for the first unknown (height) (computed also at interface with boundary conditions
-%   F2Ext   numerical flux for the first unknown (discharge) (computed also at interface with boundary conditions
-    
+%     FExt      vector containing the numerical flux for the unknowns by columns
+%               (computed also at interface with boundary conditions)
+    %% physical parameters
+    g = 1;
+    f1 = @(h,m) (m);
+    f2 = @(h,m) (m.^2./h + 0.5*g*h.^2);
+    %% compute
     % flux left
     hu = u(:,1);
     mu = u(:,2);
@@ -20,6 +21,5 @@ function [FExt] = LFNumericalFlux(u, v, f1, f2, g, maxVel)
     Fv = [f1(hv,mv), f2(hv,mv)];
     % return flux
     FExt = 0.5*(Fu+Fv) - 0.5*maxVel*(v-u);
-
 end
 

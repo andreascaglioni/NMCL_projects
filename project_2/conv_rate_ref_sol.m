@@ -4,11 +4,11 @@ close all;
 clear;
 %% conpute error wrt referecen solution and plot
 % reference solution
-dxRef =  0.000625;
+dxRef =  0.000625 ;%0.000625;
 [ccRef, XhRef, uhRef, ~]=main(dxRef);
 hhRef = XhRef(:,1); mhRef=XhRef(:,2);
 %mesh spacings
-dx = [0.04; 0.02; 0.01; 0.005; 0.0025];% 0.00125];
+dx = [0.04 0.02 0.01 0.005 0.0025, 0.00125];
 err = zeros(length(dx),1);
 for i = 1:length(dx)
     [cc, Xh, uh, ~]=main(dx(i));

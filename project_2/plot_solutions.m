@@ -35,8 +35,3 @@ legend( 'dx=0.00125', 'dx=0.01', 'dx=0.005');%, 'Exact solution');
 grid on;
 title 'Discharge';
 set(gca,'FontSize',16);
-% subplot(3,1,3);
-% plot(ccRef(1:end-1), uhRef, cc001(1:end-1), uh001, cc0005(1:end-1), uh0005);
-% legend('dx=0.00125', 'dx=0.01', 'dx=0.005');
-% grid on;
-% title 'Speed'

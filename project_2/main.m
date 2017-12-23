@@ -1,31 +1,29 @@
     function [xx, Xh, uh, ERR]=main(dx)
 % the "main" function fo the assignment which executes the task and calls
-% the other functions. The only data is the meshs pacing, howoever all
-% other parametnes can be chose in the section "choose" (boundary 
+% the other functions. The only data is the meshs spacing, however all
+% other parametnes can be chosen in the section "choose" (boundary 
 % conditions, initial conditions, source term, exact solution, numerical 
-% flux) (see comments) and " domain and discretization" (CFL number, final
+% flux) (see comments) and "domain and discretization" (CFL number, final
 % time).
 % data:
 %     dx      spacing for space discretization
 % returns:    
-%     cc      vector containig interface points of cells
-%     hh      numerical solution for height at final time
-%     mh      numerical solution for discharge at final time
+%     xx      vector containig centerpoints of cells
+%     Xh      vector containing the solution at final time T (by columns)
 %     uh      numerical solution for speed (ratio discharge/height) at 
 %             final time
-%     ERR     L1 error of the numerical solution wrt the analytical 
-%        solution (n.b. relevant only if the analytical solution is available
-%% choose
-BCNumber = 0;   % 0:periodic;   1:open
-ICNumber = 0;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
-SourceNumber = 0;  % 0: ex: 1.1;   1: no source
-ExaNumber = 0;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
+%     ERR     L1 error of the numerical solution  at final time (n.b. 
+%     relevant only if the analytical solution is available
+%% Choose
+BCNumber = 1;   % 0:periodic;   1:open
+ICNumber = 3;   % 0: ex. 1.1;   1,2: ex. 1.2(a) and 1.2(b);     3: ex. 1.4
+SourceNumber = 1;  % 0: ex: 1.1;   1: no source
+ExaNumber = 1;  % 0:ex. 1.1;   1: no exact sol available (put it to 0)
 FluxNumber = 0; % 0:LF;     1:Roe
-SlopeNumber = 0;    %0: zero;   1: MinMod;  2:MUSCL
+SlopeNumber = 2;    %0: zero;   1: MinMod;  2:MUSCL
+
 %% physical parameters
 g = 1;
-f1 = @(h,m) (m);
-f2 = @(h,m) (m.^2./h + 0.5*g*h.^2);
 %% IC
 switch ICNumber
     case 0
@@ -33,7 +31,7 @@ switch ICNumber
         h0 = @(x) (1.+0.5*sin(pi*x));
         m0 = @(x) (u*h0(x));
     case 1
-         h0 = @(x) (1.-0.1*sin(pi*x));
+        h0 = @(x) (1.-0.1*sin(pi*x));
         m0 = @(x) (0.*x);
     case 2
          h0 = @(x) (1.-0.2*sin(2*pi*x));
@@ -42,76 +40,62 @@ switch ICNumber
         h0 = @(x) (1.+0*x);
         m0 = @(x) (-1.5*(x<1.));
 end
-%% source term
-switch SourceNumber 
-    case 0
-        %S1 = @(v, x,t) (pi/2*(v-1).*cos(pi*(x-t)));
-        %S2 = @(v, x,t) (pi/2*cos(pi*(x-t)).*(-v+v.^2+g*h0(x-t)));
-        S1Prim = @(v, x,t) (0.5*(v-1).*sin(pi*(x-t)));
-        S2Prim = @(v, x,t) ( 0.5*(g-v+v.^2).*sin(pi*(x-t)) ...
-                           + 0.25*g*pi* (0.5/pi*sin(pi*(x-t)).^2));
-    case 1
-        %S1 = @(v, x,t) 0*v+0*x+0*t;
-        %S2 = @(v, x,t)  0*v+0*x+0*t;
-        S1Prim = @(v, x,t)  0*v+0*x+0*t;
-        S2Prim = @(v, x,t)  0*v+0*x+0*t;
-end
 %% exact solution
 switch ExaNumber
     case 0
         hExa = @(x,t) h0(x-t);
-        mExa = @(x,t) u*hExa(x,t);
+        mExa = @(x,t) u * hExa(x,t);
     case 1
         hExa = @(x,t) 0*x+0*t;
         mExa = @(x,t) 0*x+0*t;
 end
 %% domain and discretization
-xx = 0:dx:2;    %cells boundaries
-cc = dx/2:dx:2-dx/2;    %cells' centerpoints
-N = length(cc); % number of cells
+cc = 0:dx:2;    % cells' boundaries
+xx = dx/2:dx:2-dx/2;    % cells' centerpoints
+N = length(xx); % number of cells
 CFL = 0.5;
-T = 2.;
+T = 0.5;
 %% discrete IC (integrated)
-hh0 = zeros(N, 1);      %stores discrete solution in a 1 dim vector (for every t)
-mh0 = zeros(N, 1);
+hh = zeros(N, 1);
+mh = zeros(N, 1);
 for j = 1:N
-    hh0(j) = integral(h0,xx(j),xx(j+1),'AbsTol',1e-14)/dx;
-    mh0(j) = integral(m0,xx(j),xx(j+1),'AbsTol',1e-14)/dx;
+    hh(j) = integral(h0,cc(j),cc(j+1),'AbsTol',1e-14)/dx;
+    mh(j) = integral(m0,cc(j),cc(j+1),'AbsTol',1e-14)/dx;
 end
-%% solution vectors
-hh = hh0;  %initialize solution to IC
-mh = mh0;
-uh = mh0./hh0;
+%% velocity and solution vectors
+uh = mh./hh;
 Xh = [hh, mh];
-% plotSolAtTime(xx, hh, @(x)hExa(x,0.), mh, @(x)mExa(x,0.));
-% press  = waitforbuttonpress;
 %% solve
 time = 0.;
-% figure;
+nIter = 0;
 while time < T
     %compute new timestep
     maxVel = max(abs(uh)+(g*Xh(:,1)).^0.5);
     k = CFL*dx/maxVel;
     if(time+k>T)
-        time = T-k;
+        k = T-time;
     end
     % Update solution
-    rhs = eval_rhs(Xh, f1, f2, g, S1Prim, S2Prim, xx, dx, time, maxVel, BCNumber, FluxNumber, SlopeNumber); 
+    rhs = eval_rhs(Xh, cc, dx, time, maxVel, BCNumber, FluxNumber, SlopeNumber, SourceNumber); 
     X1 = Xh + k*rhs;
-    rhs = eval_rhs(X1, f1, f2, g, S1Prim, S2Prim, xx, dx, time+k, maxVel, BCNumber, FluxNumber, SlopeNumber); 
+    rhs = eval_rhs(X1, cc, dx, time+k, maxVel, BCNumber, FluxNumber, SlopeNumber, SourceNumber); 
     X2 = (3*Xh + X1 + k*rhs)/4;
-	rhs = eval_rhs(X2, f1, f2, g, S1Prim, S2Prim, xx, dx, time+0.5*k, maxVel, BCNumber, FluxNumber, SlopeNumber); 
+	rhs = eval_rhs(X2, cc, dx, time+0.5*k, maxVel, BCNumber, FluxNumber, SlopeNumber, SourceNumber); 
     Xh = (Xh + 2*X2 + 2*k*rhs)/3;
     uh = Xh(:,2)./Xh(:,1);
-    time = time+k;
     %plot sol at every timestep
-%    plotSolAtTime(cc, Xh, @(x)hExa(x,time), @(x)mExa(x,time));
-%    press = waitforbuttonpress;
-%    pause(0.001);
+    if(mod(nIter,1)==0)
+      plotSolAtTime(xx, Xh,  @(x)hExa(x,time), @(x)mExa(x,time));
+%       plotErrAtTime(@(x)hExa(x,time), @(x)mExa(x,time), Xh, xx, dx, cc, time);
+%       press = waitforbuttonpress;
+      pause(0.0001);
+    end
+   time = time+k;
+   nIter = nIter +1;
 end
 %% plot final solution
 figure
-plotSolAtTime(cc, Xh,  @(x)hExa(x,T), @(x)mExa(x,T));
+plotSolAtTime(xx, Xh,  @(x)hExa(x,T), @(x)mExa(x,T));
 %% compute error at final time (in L^1)
-ERR = computeL1Error(@(x)hExa(x,T), @(x)mExa(x,T), Xh, cc, dx);
+ERR = computeL1Error(@(x)hExa(x,time), @(x)mExa(x,time), Xh, cc, dx);
 end

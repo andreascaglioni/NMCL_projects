@@ -1,16 +1,16 @@
-function [FExt] = RoeNumericalFlux(u, v, f1, f2, g, maxVel)
+function [FExt] = RoeNumericalFlux(u, v, maxVel)
 % Computes Roe numerical flux of finite volumes method applied to shallow water (1d). 
 % data: 
-%     hh    vecor of first unknown (height)
-%     mh    vecor of second unknown (discharge)
-%     f1    function handle of first component of the problem's flux
-%     f2    function handle of secondcomponent of the problem's flux
-%     g     real number (gravity acceleration)
+%     u,v       vectors argument of the flux
+%     maxVel    maximum speed of the system
 % returns:
-%   F1Ext   numerical flux for the first unknown (height) (computed also at interface with boundary conditions
-%   F2Ext   numerical flux for the first unknown (discharge) (computed also at interface with boundary conditions
-    
-
+%   FExt        vector containing the numerical flux for the unknowns by columns
+%               (computed also at interface with boundary conditions)
+    %% physical parameters
+    g = 1;
+    f1 = @(h,m) (m);
+    f2 = @(h,m) (m.^2./h + 0.5*g*h.^2);
+    %% compute
     N = length(u)-1;
     % flux left
     hu = u(:,1);
@@ -20,7 +20,6 @@ function [FExt] = RoeNumericalFlux(u, v, f1, f2, g, maxVel)
     hv = v(:,1);
     mv = v(:,2);
     Fv = [f1(hv,mv), f2(hv,mv)];
-    
     %% change of variables
     z1 = 0.5*(hv.^0.5 + hu.^0.5);
     z1s = 0.5*(hv + hu);
@@ -38,6 +37,5 @@ function [FExt] = RoeNumericalFlux(u, v, f1, f2, g, maxVel)
     FExt = 0.5*(Fu+Fv) ...
          - 0.5*([ARoe(:,1,1).*(hv-hu) + ARoe(:,1,2).*(mv-mu), ...
                  ARoe(:,2,1).*(hv-hu) + ARoe(:,2,2).*(mv-mu)]);
-    
 end
 

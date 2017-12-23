@@ -1,10 +1,17 @@
-function [ Fh ] = eval_flux(Xhl, Xhr, FluxNumber, f1, f2, g,maxVel)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+function [ Fh ] = eval_flux(u, v, FluxNumber,maxVel)
+% allows to choose which slope to use an computes it
+% Data:
+%     u,v         vectors containig the values to use to compute the slope
+%     FluxNumber  number to choose the numerical flux
+%     maxVel      maximum velocity of the system
+% Returns:
+%     Fh          vaactor containing (by columns) values of flux
+%% choose and compute flux
     switch FluxNumber
         case 0
-            Fh = LFNumericalFlux(Xhl, Xhr, f1, f2, g, maxVel);
+            Fh = LFNumericalFlux(u, v, maxVel);
         case 1
-            Fh = RoeNumericalFlux(Xhl, Xhr, f1, f2, g, maxVel);
+            Fh = RoeNumericalFlux(u, v, maxVel);
+    end
 end
 
