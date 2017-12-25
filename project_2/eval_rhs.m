@@ -12,6 +12,8 @@ function [ rhs ] = eval_rhs( Xh, cc, dx, time, maxVel, BCNumber, FluxNumber, Slo
 %     SourceNumber  number to choose the source term of the problem
 % Returns:
 %     rhs           vector containing the right hand side  
+%% physical parameters
+g = 1;
 %% source term
 switch SourceNumber 
     case 0
