@@ -4,19 +4,20 @@ close all;
 clear;
 %% conpute error wrt referecen solution and plot
 % reference solution
-dxRef =  0.000625;
-[ccRef, hhRef, mhRef, uhRef, ~]=main(dxRef);
+dxRef =  0.00125;
+[xxRef, XhRef,~, ~]=main(dxRef);
+%XhRef = XhRef(1:end-1,:); 
+hhRef = XhRef(:,1); mhRef=XhRef(:,2);
 %mesh spacings
 dx = [0.04; 0.02; 0.01; 0.005; 0.0025];% 0.00125];
 err = zeros(length(dx),1);
 for i = 1:length(dx)
-    [cc, hh, mh, uh, ~]=main(dx(i));
+    [xx, Xh, ~, ~]=main(dx(i));
+    %Xh = Xh(1:end-1,:);
     % interpolate solution in reference mesh
-    hhInt = repmat(hh, [1, dx(i)/dxRef])';
-    hhInt = hhInt(:);
-    mhInt = repmat(mh, [1, dx(i)/dxRef])';
-    mhInt = mhInt(:);
-    err(i) = dxRef*(sum(abs(hhInt-hhRef))+sum(abs(mhInt-mhRef)));
+    hhInt = interp1(xx, Xh(:,1), xxRef);
+    mhInt = interp1(xx, Xh(:,2), xxRef);
+    err(i) = dxRef*(sum(abs(hhRef-hhInt')) + sum(abs(mhRef-mhInt')));
 end
 %% plot
 x0=10;
@@ -32,6 +33,5 @@ ylabel 'Error';
 legend('Error w.r.t. reference solution', 'f(dx)=dx');
 set(gcf,'units','points','position',[x0,y0,width,height]);
 set(gca,'FontSize',16);
-xlim([1.e-3 5.e-2]);
-ylim([1.e-2 3.e-1]);
-    
+% xlim([1.e-3 5.e-2]);
+% ylim([1.e-2 3.e-1]);
